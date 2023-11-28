@@ -75,7 +75,33 @@ woo_map1+woo_map2
 # Election results
 ```{r}
 library(dplyr)
-results=read.csv("data/worc_23_election_atlarge.csv")```
+results=read.csv("data/worc_23_election_atlarge.csv")
+
+```
+# creates a new table called prec_results with the joined data
+prec_results = left_join(precs, results, by=c('Ward_Precinct'='ward'))
+
+#make sure we still have a simple-feature spatial ojbect that can be mapped
+head(prec_results)
+
+#we need to make a list of all of the candidates that we want to make maps for
+candidates = colnames(prec_results[8:19]) # we use 8 through 19 because those are the columns with our candidates
+
+#we need to make an empty list that will hold our maps
+## IMPORTANT: If you re-run the loop below, it will keep adding to the list, so you need to run this as part of the loop to clear the list each-time
+mapz = list() 
+
+for (i in candidates[1:12]){ # this is telling R to go through our list of candidates and for each one do something
+
+#the first thing to do is make a map, the important thing here is the tm_polygons uses the variable "i", which is the name of a candidate -- technically the name of a column -- that it will use to create the map.
+  
+#STUDENTS: try adjusting the tm_polygons function with properties you developed above to change the maps
+  themap = tm_shape(prec_results) + tm_polygons(i) + tm_layout(legend.outside = TRUE)
+  mapz<-append(mapz,list(themap)) #we then add each map to our list
+}
+
+#use tmap_arrange to display all the maps in 4 columns
+tmap_arrange(mapz, ncol=4)
 
 
 
